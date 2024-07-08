@@ -42,7 +42,7 @@ services:
     depends_on:
       - backend
     env_file:
-      - ./frontend/ .env
+      - ./frontend/.env
 
   backend:
     build:
@@ -53,7 +53,7 @@ services:
     depends_on:
       - db
     env_file:
-      - ./backend/ .env
+      - ./backend/.env
     volumes:
       - ./backend:/app
 
