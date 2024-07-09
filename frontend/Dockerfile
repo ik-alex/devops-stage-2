@@ -1,16 +1,17 @@
-# Stage 1: Build the application
-FROM node:18.20.0 as build-stage
+# Use the latest official Node.js image as a base
+FROM node:latest
 
-COPY . /app
-
+# Set the working directory
 WORKDIR /app
 
+# Copy the application files
+COPY . .
+
+# Install dependencies
 RUN npm install
 
-RUN npm run build
+# Expose the port the development server runs on
+EXPOSE 5173
 
-# Stage 2: Serve app with Nginx server
-FROM nginx:1.19.6
-
-COPY --from=build-stage /app/dist /usr/share/nginx/html
-# COPY frontend/nginx.conf /etc/nginx/nginx.conf
+# Run the development server
+CMD ["npm", "run", "dev", "--", "--host"]

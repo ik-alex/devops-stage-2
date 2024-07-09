@@ -1,34 +1,25 @@
-FROM python:3.10-slim
+# Use the latest official Python image as a base
+FROM python:latest
 
-#install curl and other dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    gcc \
-    libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
+# Install Node.js and npm
+RUN apt-get update && apt-get install -y \
+    nodejs \
+    npm
 
-# install poetry
-RUN curl -sSL https://install.python-poetry.org | python3 -
+# Install Poetry using pip
+RUN pip install poetry
 
-# Add Poetry to PATH
-ENV PATH="${PATH}:/root/.local/bin"
-
-# set working directory
+# Set the working directory
 WORKDIR /app
 
-# copy only the pyproject.toml and poetry.lock files
-COPY pyproject.toml poetry.lock* ./
-
-# install dependencies using poetry
-RUN poetry install --no-root
-
-# copy the rest of the application to the container
+# Copy the application files
 COPY . .
 
-#Make the prestart script executable
-RUN chmod +x ./prestart.sh
+# Install dependencies using Poetry
+RUN poetry install
 
-#Expose port 8000
-EXPOSE  8000
+# Expose the port FastAPI runs on
+EXPOSE 8000
 
-CMD ["poetry", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# Run the prestart script and start the server
+CMD ["sh", "-c", "poetry run bash ./prestart.sh && poetry run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"]
